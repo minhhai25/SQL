@@ -72,6 +72,14 @@ select *
 from SinhVien
 where TenSV like N'[^a-m]%'
 go
+select * 
+from SinhVien
+where SUBSTRING (TenSV,2,1) between 'a' and 'm'
+go
+select * 
+from SinhVien
+where LEFT(TenSV,1) between 'a'and 'm'
+go
 /*
 10. Cho biết danh sách những sinh viên mà têncó chứa ký tự nằm trong khoảng
 từ a đến m, gồm các thông tin: Họ tên sinh viên, Ngày sinh, Nơi sinh, Học
@@ -259,5 +267,144 @@ FROM Khoa k inner join SinhVien s on k.MaKH = s.MaKH
 	inner join MonHoc h on kq.MaMH = h.MaMH
 where k.MaKH = N'TH'
 
+--8. Kết quả học tập của sinh viên, gồm các thông tin: Họ tên sinh viên, Mã khoa,  
+--Tên môn học, Điểm thi, Loại. Trong đó, Loại sẽ là Giỏi nếu điểm thi > 8, từ 6 đến  8 
+--thì Loại là Khá, nhỏ hơn 6 thì loại là Trung Bình
+
+select CONCAT(HoSV,'', TenSV) as HoTen ,  MaKH , KQ.Diem, TenMH,
+iif(KQ.Diem>8,N'Giỏi',iiF(KQ.Diem>6,N'Khá',N'Trung Bình'))as Loại
+from SinhVien SV
+inner join Ketqua KQ on SV.MaSV= KQ.MaSV
+inner join MonHoc MH on MH.MaMH=KQ.MaMH
+
+--====================================
+--BÀI 3
+--1. Cho biết trung bình điểm thi theo từng môn, gồm các thông tin: Mã môn, Tên  môn, Trung bình điểm thi 
+select MH.MaMH,TenMH,AVG(KQ.Diem) as DiemTrungBinh
+from MonHoc MH
+inner join Ketqua KQ on KQ.MaMH=MH.MaMH 
+group by MH.MaMH,TenMH
+--2. Danh sách số môn thi của từng sinh viên, gồm các thông tin: Họ tên sinh viên,  Tên khoa, Tổng số môn thi 
+select  CONCAT(HoSV,'',TenSV) as HoTen, TenKH, count(KetQua.MaMH)as TongSoMH 
+from SinhVien 
+inner join Khoa on Khoa.MaKH = SinhVien.MaKH 
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+group by HoSV,TenSV,TenKH
+--3. Tổng điểm thi của từng sinh viên, các thông tin: Tên sinh viên, Tên khoa, Phái,  Tổng điểm thi
+select TenSV, Phai, TenKH,sum(Diem)as TongDiem
+from SinhVien 
+inner join Khoa on Khoa.MaKH = SinhVien.MaKH
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+group by TenSV,Phai,TenKH
 
 
+--4. Cho biết tổng số sinh viên ở mỗi khoa, gồm các thông tin: Tên khoa, Tổng số sinh  viên 
+
+
+--5. Cho biết điểm cao nhất của mỗi sinh viên, gồm thông tin:Họ tên sinh viên, Điểm  
+
+select CONCAT(HoSV,'',TenSV) as HoTen,Max( Diem)as Diem
+from SinhVien 
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+group by CONCAT(HoSV,'',TenSV)
+--6.Thông tin của môn học có số tiết nhiều nhất: Tên môn học, Số tiết 
+--7. Cho biết học bổng cao nhất của từng khoa, gồm Mã khoa, Tên khoa, Học bổng  cao nhất  
+
+select Khoa.MaKH,TenKH,max(HocBong)as HocBongCaoNhat
+from Khoa 
+join SinhVien on SinhVien.MaKH= Khoa.MaKH
+group by Khoa.MaKH,TenKH
+--8. Cho biết điểm cao nhất của mỗi môn, gồm: Tên môn, Điểm cao nhất  
+--9. Thống kê số sinh viên học của từng môn, thông tin có: Mã môn, Tên môn, Số  sinh viên đang học 
+select MonHoc.MaMH,TenMH, count(MaSV)as SoSinhVien 
+from MonHoc 
+join Ketqua on MonHoc.MaMH = Ketqua.MaMH
+group by MonHoc.MaMH,TenMH
+--10.Cho biết môn nào có điểm thi cao nhất, gồmcác thông tin: Tên môn, Số tiết, Tên  sinh viên, Điểm  
+--11.Cho biết khoa nào có đông sinh viên nhất, gồm Mã khoa, Tên khoa, Tổng số sinh  viên  
+--12.Cho biết khoa nào có sinh viên lảnh học bổng cao nhất, gồm các thông tin sau:  Tên khoa, Họ tên sinh viên, Học bổng 
+--13.Cho biết sinh viên của khoa Tin học có có học bổng cao nhất, gồm các thông tin:  Mã sinh viên, Họ sinh viên, Tên sinh viên, Tên khoa, Học bổng  
+--14.Cho biết sinh viên nào có điểm môn Cơ sở dữ liệu lớn nhất, gồm thông tin: Họ  sinh viên, Tên môn, Điểm  
+--15.Cho biết 3 sinh viên có điểm thi môn Đồ hoạthấp nhất, thông tin: Họ tên sinh  viên, Tên khoa, Tên môn, Điểm  
+--16.Cho biết nào có nhiều sinh viên nữ nhất, gồm các thông tin: Mã khoa, Tên khoa  
+--17.Thống kê sinh viên theo khoa, gồm các thông tin: Mã khoa, Tên khoa, Tổng số  sinh viên, Tổng số sinh viên nữ  
+--18.Cho biết kết quả học tập của sinh viên, gồm Họ tên sinh viên, Tên khoa, Kết quả.  Trong đó, Kết quả sẽ là Đậu nếu không có môn nào có điểm nhỏ hơn 4  
+--19.Danh sách những sinh viên không có môn nàonhỏ hơn 4 điểm, gồm các thông  tin: Họ tên sinh viên, Tên khoa, Phái  
+--20.Cho biết danh sách những môn không có điểm thi nhỏ hơn 4, gồm các thông  tin: Mã môn, Tên Môn  
+--21.Cho biết những khoa không có sinh viên rớt, sinh viên rớt nếu điểm thi của môn  nhỏ hơn 5, gồm các thông tin: Mã khoa, Tên khoa  
+--22.Thống kê số sinh viên đậu và số sinh viên rớt của từng môn, biết răng sinh viên  rớt khi điểm của môn nhỏ hơn 5, gồm có: Mã môn, Tên môn, Số sinh viên đậu,  Số sinh viên rớt 
+--23.Cho biết môn nào không có sinh viên rớt, gồm có: Mã môn, Tên môn 
+--24.Danh sách sinh viên không có môn nào rớt, thông tin gồm: Mã sinh viên, Họ tên,  Mã khoa 
+--25.Danh sách các sinh viên rớt trên 2 môn, gồm Mã sinh viên, Họ sinh viên, Tên  sinh viên, Mã khoa  
+--26.Cho biết danh sách những khoa có nhiều hơn 10 sinh viên, gồm Mã khoa, Tên  khoa, Tổng số sinh viên của khoa  
+--27.Danh sách những sinh viên thi nhiều hơn 4 môn, gồm có Mã sinh viên, Họ tên  sinh viên, Số môn thi  
+--28.Cho biết khoa có 5 sinh viên nam trở lên, thông tin gồm có: Mã khoa, Tên khoa,  Tổng số sinh viên nam  
+--29.Danh sách những sinh viên có trung bình điểm thi lớn hơn 4, gồm các thông tin  sau: Họ tên sinh viên, Tên khoa, Phái, Điểm trung bình các môn  
+--30.Cho biết trung bình điểm thi của từng môn, chỉ lấy môn nào có trung bình điểm  thi lớn hơn 6, thông tin gồm có: Mã môn, Tên môn, Trung bình điểm 
+--=================================================================
+--BÀI 4
+--1. Cho biết danh sách những sinh viên của một khoa, gồm: Mã sinh viên, Họ tên  sinh viên, Giới tính, Tên khoa.
+--Trong đó, giá trị mã khoa cần xem danh sách sinh  viên sẽ được người dùng nhập khi thực thi câu truy vấn  
+declare @MaKH nvarchar(2)
+set @MaKH = 'AV'
+select concat(HoSV,'', TenSV), Phai as GioiTinh, TenKH
+from SinhVien
+inner join Khoa on Khoa.MaKH=SinhVien.MaKH
+where Khoa.MaKH = @MaKH
+
+--2. Liệt kê danh sách sinh viên có điểm môn Cơ sở dữ liệu lớn hơn một giá trị 
+--bất  kỳ do người sử dụng nhập vào khi thực thi câu truy vấn, thông tin gồm: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm  
+declare @Diem real
+set @Diem = 3
+select SinhVien.MaSV, concat(HoSV,'',TenSV) as HoTen, TenMH, Diem 
+from SinhVien
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+inner join MonHoc on Ketqua.MaMH=MonHoc.MaMH
+where TenMH= N'Cơ sở dữ liệu' and Diem>@Diem
+--3. Cho kết quả thi của các sinh viên theo môn, tên môn cần xem kết quả sẽ được  nhập vào khi thực thi câu truy vấn.
+--Thông tin hiển thị gồm: Mã sinh viên, Tên  khoa, Tên môn, Điểm
+declare @TenMon nvarchar(50)
+set @TenMon= N'Cơ sở dữ liệu'
+select SinhVien.MaSV, TenKH, TenMH, Diem 
+from SinhVien
+inner join Khoa on Khoa.MaKH=SinhVien.MaKH
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+inner join MonHoc on Ketqua.MaMH=MonHoc.MaMH
+where TenMH=@TenMon
+
+--==============
+--BÀI 5
+--1. Danh sách sinh viên chưa thi môn nào, thông tin gồm: Mã sinh viên, Mã khoa,  Phái  
+select MaSV,MaKH, Phai
+from SinhVien
+where MaSV not in (select MaSV from Ketqua)
+--2. Danh sách những sinh viên chưa thi môn Cơsở dữ liệu, gồm các thông tin: Mã  sinh viên, Họ tên sinh viên, Mã khoa  
+select MaSV, CONCAT(HoSV,'',TenSV),MaKH
+from SinhVien 
+where MaSV not in (select MaSV from Ketqua
+inner join MonHoc on MonHoc.MaMH=Ketqua.MaMH
+where TenMH=N'Cơ sở dữ liệu') 
+--3. Cho biết môn nào chưa có sinh viên thi, gồm thông tin về: Mã môn, Tên môn,  Sô tiết 
+select MaMH,TenMH ,Sotiet
+from MonHoc
+where MaMH not in (select MonHoc.MaMH from MonHoc inner join Ketqua on Ketqua.MaMH=MonHoc.MaMH  )
+--4. Khoa nào chưa có sinh viên học  
+select TenKH
+from Khoa 
+where MaKH not in (select Khoa.MaKH from SinhVien inner join Khoa on Khoa.MaKH=SinhVien.MaKH)
+--5. Cho biết những sinh viên của khoa Anh văn chưa thi môn Cơ sở dữ liệu  
+select CONCAT(HoSV,'',TenSV)as TenSVChuaThiMonCSDL 
+from SinhVien
+inner join Khoa on Khoa.MaKH= SinhVien.MaKH
+where TenKH= N'Anh Văn' and MaSV not in 
+(select KetQua.MaSV 
+from Ketqua inner join MonHoc on MonHoc.MaMH=Ketqua.MaMH
+where TenMH= N'Cơ sở dữ liệu'
+)
+--6. Cho biết môn nào chưa có sinh viên khoa Lý thi  
+--7. Danh sách những sinh viên có điểm thi mônĐồ hoạ nhỏ hơn điểm thi môn Đồ  hoạ nhỏ nhất của sinh viên khoa Tin học  
+--8. Liệt kê những sinh viên sinh sau sinh viên có tuổi nhỏ nhất trong khoa Anh văn  
+--9. Cho biết những sinh viên có học bổng lớn hơn tổng học bổng của những sinh  viên thuộc khoa Triết 
+--10.Danh sách sinh viên có nơi sinh cùng với nơi sinh của sinh viên có học bổng lớn  nhất trong khoa Lý  
+--11.Danh sách sinh viên có điểm cao nhất ứng với mỗi môn, gồm thông tin: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm  
+--12.Các sinh viên có học bổng cao nhất theo từng khoa, gồm Mã sinh viên, Tên khoa,  Học bổng 
