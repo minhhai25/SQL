@@ -403,8 +403,64 @@ where TenMH= N'Cơ sở dữ liệu'
 )
 --6. Cho biết môn nào chưa có sinh viên khoa Lý thi  
 --7. Danh sách những sinh viên có điểm thi mônĐồ hoạ nhỏ hơn điểm thi môn Đồ  hoạ nhỏ nhất của sinh viên khoa Tin học  
---8. Liệt kê những sinh viên sinh sau sinh viên có tuổi nhỏ nhất trong khoa Anh văn  
+
+select CONCAT(HoSV,'',TenSV)
+from SinhVien 
+inner join Ketqua on Ketqua.MaSV= SinhVien.MaSV
+inner join MonHoc on Ketqua.MaMH = MonHoc.MaMH
+where TenMH= N'Đồ họa ứng dụng' and
+Ketqua.Diem < (select min(Diem)
+				from Ketqua inner join MonHoc on MonHoc.MaMH=Ketqua.MaMH
+				inner join SinhVien on SinhVien.MaSV=Ketqua.MaSV
+				inner join Khoa on SinhVien.MaKH= Khoa.MaKH
+				where TenKH= N'Tin học' and TenMH=N'Đồ họa ứng dụng') 
+--8. Liệt kê những sinh viên sinh sau sinh viên có tuổi nhỏ nhất trong khoa Anh văn
+
+select CONCAT(HoSV,'',TenSV),YEAR(GETDATE()) - YEAR(NgaySinh) AS Tuoi
+from SinhVien
+where YEAR(GETDATE()) - YEAR(NgaySinh)  < (select min(YEAR(GETDATE()) - YEAR(NgaySinh))  
+													from SinhVien 
+													inner join Khoa on khoa.MaKH= SinhVien.MaKH 
+													where TenKH= N'Anh văn') 
+--những sinh viên có ngày sinh sau sinh viên nhỏ nhất khoa tin
+select CONCAT(HoSV,'',TenSV),NgaySinh
+from SinhVien
+where NgaySinh  < (select min(NgaySinh)  
+					from SinhVien 
+					inner join Khoa on khoa.MaKH= SinhVien.MaKH 
+					where TenKH= N'Anh văn') 
 --9. Cho biết những sinh viên có học bổng lớn hơn tổng học bổng của những sinh  viên thuộc khoa Triết 
+
 --10.Danh sách sinh viên có nơi sinh cùng với nơi sinh của sinh viên có học bổng lớn  nhất trong khoa Lý  
 --11.Danh sách sinh viên có điểm cao nhất ứng với mỗi môn, gồm thông tin: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm  
 --12.Các sinh viên có học bổng cao nhất theo từng khoa, gồm Mã sinh viên, Tên khoa,  Học bổng 
+--===================================
+--BÀI 6 : THÊM DỮ LIỆU VÀO CSDL
+--1. Thêm một sinh viên mới gồm các thông tin sau: • Mã sinh viên: C01  
+--• Họ sinh viên: Lê Thành  
+--• Tên sinh viên: Nguyên  
+--• Phái: Nam  
+--• Ngày sinh: 20/10/1980  
+--•Nơi sinh: Thành phố Hồ Chí Minh  
+--•Mã khoa: TH 
+--Học bổng: 850,000  
+--2. Thêm một môn học mới gồm các thông tin sau:  • Mã môn học: 06  
+--• Tên môn học: Xử lý ảnh  
+--• Số tiết: 45  
+--3. Thêm một khoa mới gồm các thông tin sau:  • Mã khoa: CT  
+--• Tên khoa: Công trình  
+--4. Thêm một sinh viên mới gồm các thông tin sau:  • Mã sinh viên: C02  
+--• Họ sinh viên: Nguyễn Trần  
+--• Tên sinh viên: Quân  
+--• Phái: Nam  
+--• Ngày sinh: lấy ngày hiện hiện  
+--• Nơi sinh: Huế  
+--• Mã khoa: CT  
+--• Học bổng: 950,000 
+--5. Thêm vào bảng kết quả gồm các thông tin sau:  
+--• Mã sinh viên: lấy tất cả những sinh viên của khoa Tin học  
+--• Mã môn học: 06  
+--• Điểm: 7  
+--6. Thêm vào bảng kết quả gồm các thông tin sau:  
+--• Mã sinh viên: C02  
+--• Mã môn học: lấy tất cả những môn học có trong bảng môn học  • Điểm: 8 
