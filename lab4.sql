@@ -61,7 +61,7 @@ go
 */
 select HoSV, TenSV, NgaySinh, Phai
 from SinhVien
-where TenSV like N'Thị'
+where HoSV like N'%Thị%'
 go
 /*
 9. Cho biết danh sách những sinh viên ký tự đầu tiên của
@@ -321,8 +321,23 @@ from MonHoc
 join Ketqua on MonHoc.MaMH = Ketqua.MaMH
 group by MonHoc.MaMH,TenMH
 --10.Cho biết môn nào có điểm thi cao nhất, gồmcác thông tin: Tên môn, Số tiết, Tên  sinh viên, Điểm  
+select top 1 with ties TenMH,Sotiet,TenSV,Diem
+from MonHoc
+inner join Ketqua on Ketqua.MaMH=MonHoc.MaMH
+inner join SinhVien on SinhVien.MaSV=Ketqua.MaSV
+order by Diem desc
 --11.Cho biết khoa nào có đông sinh viên nhất, gồm Mã khoa, Tên khoa, Tổng số sinh  viên  
---12.Cho biết khoa nào có sinh viên lảnh học bổng cao nhất, gồm các thông tin sau:  Tên khoa, Họ tên sinh viên, Học bổng 
+select top 1 Khoa.MaKH,TenKH, count(MaSV)as TongSV 
+from Khoa
+inner join SinhVien on SinhVien.MaKH=Khoa.MaKH
+group by Khoa.MaKH,TenKH
+order by count(MaSV) desc
+--12.Cho biết khoa nào có sinh viên lảnh học bổng cao nhất, gồm các thông tin sau:  Tên khoa, Họ tên sinh viên, Học bổng
+select top 1 TenKH,CONCAT(HoSV,'',TenSV) as HoTen,HocBong
+from Khoa
+inner join SinhVien on SinhVien.MaKH=Khoa.MaKH
+group by TenKH,CONCAT(HoSV,'',TenSV) ,HocBong
+order by HocBong desc
 --13.Cho biết sinh viên của khoa Tin học có có học bổng cao nhất, gồm các thông tin:  Mã sinh viên, Họ sinh viên, Tên sinh viên, Tên khoa, Học bổng  
 --14.Cho biết sinh viên nào có điểm môn Cơ sở dữ liệu lớn nhất, gồm thông tin: Họ  sinh viên, Tên môn, Điểm  
 --15.Cho biết 3 sinh viên có điểm thi môn Đồ hoạthấp nhất, thông tin: Họ tên sinh  viên, Tên khoa, Tên môn, Điểm  
@@ -339,8 +354,23 @@ group by MonHoc.MaMH,TenMH
 --26.Cho biết danh sách những khoa có nhiều hơn 10 sinh viên, gồm Mã khoa, Tên  khoa, Tổng số sinh viên của khoa  
 --27.Danh sách những sinh viên thi nhiều hơn 4 môn, gồm có Mã sinh viên, Họ tên  sinh viên, Số môn thi  
 --28.Cho biết khoa có 5 sinh viên nam trở lên, thông tin gồm có: Mã khoa, Tên khoa,  Tổng số sinh viên nam  
---29.Danh sách những sinh viên có trung bình điểm thi lớn hơn 4, gồm các thông tin  sau: Họ tên sinh viên, Tên khoa, Phái, Điểm trung bình các môn  
+--29.Danh sách những sinh viên có trung bình điểm thi lớn hơn 4,
+--gồm các thông tin  sau: Họ tên sinh viên, Tên khoa, Phái, Điểm trung bình các môn
+select concat(HoSV,'',TenSV) as HoTen, TenKH, Phai,AVG(Diem) as DiemTrungBinh
+from SinhVien 
+inner join Khoa on Khoa.MaKH=SinhVien.MaKH
+inner join Ketqua on SinhVien.MaSV=Ketqua.MaSV
+group by concat(HoSV,'',TenSV), TenKH, Phai
+having AVG(Diem) >4
+
 --30.Cho biết trung bình điểm thi của từng môn, chỉ lấy môn nào có trung bình điểm  thi lớn hơn 6, thông tin gồm có: Mã môn, Tên môn, Trung bình điểm 
+select Monhoc.MaMH,TenMH,AVG(Diem)as DiemTrungBinh
+from MonHoc
+inner join Ketqua on Ketqua.MaMH = MonHoc.MaMH
+group by Monhoc.MaMH,TenMH
+having AVG(Diem) >6
+
+
 --=================================================================
 --BÀI 4
 --1. Cho biết danh sách những sinh viên của một khoa, gồm: Mã sinh viên, Họ tên  sinh viên, Giới tính, Tên khoa.
@@ -430,10 +460,55 @@ where NgaySinh  < (select min(NgaySinh)
 					inner join Khoa on khoa.MaKH= SinhVien.MaKH 
 					where TenKH= N'Anh văn') 
 --9. Cho biết những sinh viên có học bổng lớn hơn tổng học bổng của những sinh  viên thuộc khoa Triết 
+select *
+from SinhVien
+where HocBong > (select sum(HocBong)
+					from SinhVien inner join Khoa on Khoa.MaKH=SinhVien.MaKH
+					where TenKH=N'Triết')
+--10.Danh sách sinh viên có nơi sinh cùng với nơi sinh của sinh viên có học bổng lớn  nhất trong khoa Anh văn 
 
---10.Danh sách sinh viên có nơi sinh cùng với nơi sinh của sinh viên có học bổng lớn  nhất trong khoa Lý  
---11.Danh sách sinh viên có điểm cao nhất ứng với mỗi môn, gồm thông tin: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm  
+select MaSV, HoSV, TenSV, Phai, NgaySinh, NoiSinh, MaKH, HocBong from SinhVien
+where NoiSinh in (select top 1  NoiSinh from SinhVien
+					where MaKH in (select MaKH from Khoa where TenKH=N'Anh Văn')
+									order by HocBong desc)
+
+--11.Danh sách sinh viên có điểm cao nhất ứng với mỗi môn, gồm thông tin: Mã sinh  viên, Họ tên sinh viên, Tên môn, Điểm 
+
+--Danh sách điểm cao nhất với mỗi môn học
+select MonHoc.MaMH,TenMH, max(diem) AS DiemMax into #TMP
+from MonHoc
+inner join Ketqua on MonHoc.MaMH=Ketqua.MaMH
+group by MonHoc.MaMH,TenMH
+--
+select Sinhvien.MaSV, CONCAT(HoSV,'',TenSV) as HoTen,TenMH, Diem
+from SinhVien
+inner join Ketqua on SinhVien.MaSV=Ketqua.MaSV
+inner join #TMP on #TMP.MaMH = Ketqua.MaMH and #TMP.DiemMax=diem
+select * from #TMP
+drop table #TMP
+
+--CÁCH 2
+
+select Sinhvien.MaSV, CONCAT(HoSV,'',TenSV) as HoTen,TenMH, Diem
+from SinhVien
+inner join Ketqua on SinhVien.MaSV=Ketqua.MaSV
+inner join(
+			select MonHoc.MaMH,TenMH, max(diem) AS DiemMax 
+			from MonHoc
+			inner join Ketqua on MonHoc.MaMH=Ketqua.MaMH
+			group by MonHoc.MaMH,TenMH) TMP
+		on  TMP.MaMH= Ketqua.MaMH 
+where TMP.DiemMax=Diem
+order by TMP.TenMH
 --12.Các sinh viên có học bổng cao nhất theo từng khoa, gồm Mã sinh viên, Tên khoa,  Học bổng 
+select MaKH, max(HocBong) as MaxHB into #TMP1
+from SinhVien 
+group by MaKH
+select MaSV,TenKH,HocBong
+from SinhVien 
+inner join Khoa on khoa.MaKH=SinhVien.MaKH
+inner join #TMP1 on #TMP1.MaKH=SinhVien.MaKH 
+where #TMP1.MaxHB= SinhVien.HocBong
 --===================================
 --BÀI 6 : THÊM DỮ LIỆU VÀO CSDL
 --1. Thêm một sinh viên mới gồm các thông tin sau: • Mã sinh viên: C01  
