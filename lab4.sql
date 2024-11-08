@@ -443,7 +443,10 @@ where NgaySinh  < (select min(NgaySinh)
 --• Ngày sinh: 20/10/1980  
 --•Nơi sinh: Thành phố Hồ Chí Minh  
 --•Mã khoa: TH 
---Học bổng: 850,000  
+--Học bổng: 850,000 
+insert SinhVien (MaSV, HoSV, TenSV, Phai, NgaySinh, NoiSinh, MaKH, HocBong) values
+('D01',N'Lê Thành',N'Nguyên','False','19801020',N'Hồ Chí Minh','TH',850000)
+select * from SinhVien
 --2. Thêm một môn học mới gồm các thông tin sau:  • Mã môn học: 06  
 --• Tên môn học: Xử lý ảnh  
 --• Số tiết: 45  
@@ -461,6 +464,11 @@ where NgaySinh  < (select min(NgaySinh)
 --• Mã sinh viên: lấy tất cả những sinh viên của khoa Tin học  
 --• Mã môn học: 06  
 --• Điểm: 7  
+insert into Ketqua 
+select MaSV,'06',7
+from SinhVien
+where 
+
 --6. Thêm vào bảng kết quả gồm các thông tin sau:  
 --• Mã sinh viên: C02  
 --• Mã môn học: lấy tất cả những môn học có trong bảng môn học  • Điểm: 8 
