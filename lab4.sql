@@ -541,9 +541,47 @@ select * from SinhVien
 --• Điểm: 7  
 insert into Ketqua 
 select MaSV,'06',7
-from SinhVien
-where 
-
+from Ketqua 
+where MaSV in (select MaSV 
+				from SinhVien inner join Khoa on Khoa.MaKH= SinhVien.MaKH 
+				where TenKH= N'Tin học')
+--??????????????
 --6. Thêm vào bảng kết quả gồm các thông tin sau:  
 --• Mã sinh viên: C02  
---• Mã môn học: lấy tất cả những môn học có trong bảng môn học  • Điểm: 8 
+--• Mã môn học: lấy tất cả những môn học có trong bảng môn học  
+--• Điểm: 8 
+--==============================================
+--BÀI 7: Xoá thông tin trong cơ sở dữ liệu 
+--1. Viết câu truy vấn để tạo bảng có tên DeleteTable gồm các thông tin sau:
+--Mã  sinh viên, Họ tên sinh viên, Phái, Ngày sinh, Nơi sinh, Tên khoa, Học bổng 
+
+SELECT concat(HoSV,'',TenSV) as HoTen,Phai,NgaySinh,NoiSinh,TenKH,HocBong into DeleteTable
+							from SinhVien inner join Khoa on Khoa.MaKH=SinhVien.MaKH
+select * from DeleteTable
+--2. Xoá tất cả những sinh viên không có học bổng trong bảng DeleteTable 
+delete from DeleteTable 
+where HocBong is null or HocBong = 0
+--3. Xoá tất cả những sinh viên trong bảng DeleteTable sinh vào ngày 20/12/1987 
+--4. Xoá tất cả những sinh viên trong bảng DeleteTable sinh trước tháng 3 năm 1987 
+--5. Xoá tất cả những sinh viên nam của khoa Tin học trong bảng DeleteTable 
+
+
+--=====================
+--BÀI 8
+--1. Cập nhật số tiết của mônVăn phạm thành 45 tiết
+
+--2. Cập nhật tên của sinh viên Trần Thanh Mai thành Trần Thanh Kỳ 
+--3.Cập nhật phái của sinh viên Trần Thanh Kỳ thành phái Nam  
+--4. Cập nhật ngày sinh của sinh viên Trần thị thu Thuỷ thành 05/07/1990 
+--5. Tăng học bổng cho tất cả những sinh viên của khoa Anh văn thêm 100,000 
+--6. Cộng thêm 5 điểm môn Trí Tuệ Nhân Tạo cho các sinh viên thuộc khoa Anh văn.
+--• Điểm tối đa của môn là 10  
+--7. Tăng học bổng cho sinh viên theo mô tả sau: 
+--• Nếu là phái nữ của khoa Anh văn thì tăng 100,000  
+--• Phái nam của khoa Tin học thì tăng 150,000  
+--• Những sinh viên khác thì tăng 50,000  
+--8. Thay đỗi kết quả thi của các sinh viên theo mô tả sau:  
+--• Nếu sinh viên của khoa Anh văn thì tăng điểm môn Cơ sở dữ liệu lên 2  điểm  
+--• Nếu sinh viên của khoa Tin học thì giảm điểm môn Cơ sở dữ liệu xuống 1  điểm  
+--• Những sinh viên của khoa khác thì không thay đổi kết quả  
+--• Điểm nhỏ nhất là 0 và cao nhất là 10
